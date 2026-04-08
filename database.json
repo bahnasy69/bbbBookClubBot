@@ -1,6 +1,46 @@
 {
-  "polls": {},
-  "predictions": {},
+  "polls": {
+    "1491533100344410172": {
+      "bookId": "1",
+      "title": "A Song For A New Day",
+      "author": "Sarah Pinsker",
+      "cover": "https://media.discordapp.net/attachments/1489941396097077248/1489967280459878530/BBB1.2.jpg?ex=69d79da9&is=69d64c29&hm=8de0366dc138f605fe1aa9129ae6745ab90ce9737f03d7a501961f0e8927b154&=&format=webp&width=407&height=465",
+      "color": "#d0fa03",
+      "active": true,
+      "votes": {
+        "571951256982257665": 4.25
+      }
+    },
+    "1491570125344870470": {
+      "bookId": null,
+      "title": "test",
+      "author": "test",
+      "cover": "https://media.discordapp.net/attachments/1489941396097077248/1489967280459878530/BBB1.2.jpg?ex=69d79da9&is=69d64c29&hm=8de0366dc138f605fe1aa9129ae6745ab90ce9737f03d7a501961f0e8927b154&=&format=webp&width=407&height=465",
+      "color": "#d0fa03",
+      "active": false,
+      "votes": {}
+    }
+  },
+  "predictions": {
+    "1": [
+      {
+        "user": "1489600439581151403",
+        "text": "how crazy would it be if the government is the one behind all whatever this thing is because they wanna isolate or control ppl or some shit",
+        "percent": 17
+      }
+    ]
+  },
   "minions": {},
-  "pickpolls": {}
+  "pickpolls": {
+    "1775688712895": {
+      "options": [
+        "test1",
+        "test2",
+        "test3"
+      ],
+      "votes": {
+        "1489600439581151403": 1
+      }
+    }
+  }
 }
