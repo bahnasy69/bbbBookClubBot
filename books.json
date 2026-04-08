@@ -1,4 +1,12 @@
 {
-  "current": "",
-  "library": {}
+  "current": "1",
+  "library": {
+    "1": {
+      "title": "A Song For A New Day",
+      "author": "Sarah Pinsker",
+      "synopsis": "**WINNER OF THE NEBULA AWARD **- After a global pandemic makes public gatherings illegal and concerts impossible, except for those willing to break the law for the love of music—and for one chance at human connection. (Spoiler Free Synopsis)",
+      "cover": "https://media.discordapp.net/attachments/1489941396097077248/1489967280459878530/BBB1.2.jpg?ex=69d79da9&is=69d64c29&hm=8de0366dc138f605fe1aa9129ae6745ab90ce9737f03d7a501961f0e8927b154&=&format=webp&width=407&height=465",
+      "deadline": null
+    }
+  }
 }
