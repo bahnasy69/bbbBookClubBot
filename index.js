@@ -63,8 +63,19 @@ const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 client.once('clientReady', () => {
   client.user.setActivity({ name: 'Custom Status', state: "managing bhnso's book baddies 🔧", type: ActivityType.Custom });
   console.log('bbbBOT is online BABYY');
+
+// Fetch the channel and send the announcement
+  const BACKUP_CHANNEL_ID = '1491567581608542278'; // I used your backup channel ID, change it if needed!
   
-    const BACKUP_CHANNEL_ID = '1491567581608542278';
+  try {
+    const channel = await client.channels.fetch(BACKUP_CHANNEL_ID);
+    if (channel) {
+      await channel.send('🟢 **bbbBOT is online BABYY**'); 
+    }
+  } catch (error) {
+    console.error('Could not send online message:', error);
+  }
+  
 
 const sendBackup = async () => {
   try {
