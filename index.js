@@ -195,6 +195,33 @@ client.on('interactionCreate', async i => {
       return i.reply(pick([`${author} slapped ${tName}.`, `💥 ${author} slapped ${tName}.`, `💥 ${author} slapped ${tName}.`, `💥 ${author} slapped ${tName}.`, `💥 ${author} slapped ${tName}.`, `👋 ${author} just smacked ${tName}.`, `😶 ${tName} got slapped by ${author}.`, `💀 ${author} did not hesitate to slap ${tName}.`, `⚡ ${author} slapped ${tName} for absolutely no reason.`, `😢 ${tName} is crying cuz ${author} slapped the shit out of them.`]));
     }
 
+
+
+    if (interaction.commandName === 'backup') {
+  await interaction.reply({
+    content: 'Here is the database backup:',
+    files: ['./database.json']
+  });
+}
+
+
+    
+if (interaction.commandName === 'backup2') {
+  await interaction.reply({
+    content: 'Here is the books backup:',
+    files: ['./books.json']
+  });
+}
+
+
+
+
+
+
+    
+
+
+    
     if (i.commandName === 'throw') {
       const target = i.options.getUser('target');
       const tName = `<@${target.id}>`;
