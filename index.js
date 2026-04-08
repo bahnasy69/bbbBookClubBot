@@ -62,7 +62,28 @@ const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 // FIXED: Changed 'ready' to 'clientReady' to remove deprecation warning
 client.once('clientReady', () => {
   client.user.setActivity({ name: 'Custom Status', state: "managing bhnso's book baddies 🔧", type: ActivityType.Custom });
-  console.log('bbbBOT online');
+  console.log('bbbBOT is online BABYY');
+  
+    const BACKUP_CHANNEL_ID = '1491567581608542278';
+
+  const sendDatabaseBackup = async () => {
+    try {
+      const channel = await client.channels.fetch(BACKUP_CHANNEL_ID);
+      if (!channel || !channel.isTextBased()) return;
+
+      await channel.send({
+        content: '📦 automatic database backup',
+        files: ['./database.json']
+      });
+
+      console.log('✅ automatic database backup sent');
+    } catch (err) {
+      console.error('❌ automatic database backup failed:', err);
+    }
+  };
+
+  setInterval(sendDatabaseBackup, 6 * 60 * 60 * 1000);
+  
 });
 
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
@@ -418,3 +439,5 @@ client.on('interactionCreate', async i => {
 });
 
 client.login(process.env.TOKEN);
+
+
