@@ -66,23 +66,27 @@ client.once('clientReady', () => {
   
     const BACKUP_CHANNEL_ID = '1491567581608542278';
 
-  const sendDatabaseBackup = async () => {
-    try {
-      const channel = await client.channels.fetch(BACKUP_CHANNEL_ID);
-      if (!channel || !channel.isTextBased()) return;
+const sendBackup = async () => {
+  try {
+    const channel = await client.channels.fetch(BACKUP_CHANNEL_ID);
+    if (!channel) return console.log('backup channel not found');
 
-      await channel.send({
-        content: '📦 automatic database backup',
-        files: ['./database.json']
-      });
+    await channel.send({
+      content: '📦 automatic database backup',
+      files: ['./database.json']
+    });
 
-      console.log('✅ automatic database backup sent');
-    } catch (err) {
-      console.error('❌ automatic database backup failed:', err);
-    }
-  };
+    console.log('backup sent');
+  } catch (err) {
+    console.error('backup failed:', err);
+  }
+};
 
-  setInterval(sendDatabaseBackup, 6 * 60 * 60 * 1000);
+// run immediately
+sendBackup();
+
+// then every 6 hours
+setInterval(sendBackup, 6 * 60 * 60 * 1000);
   
 });
 
