@@ -60,7 +60,7 @@ const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 })();
 
 // FIXED: Changed 'ready' to 'clientReady' to remove deprecation warning
-client.once('clientReady', () => {
+client.once('ready', async () => {
   client.user.setActivity({ name: 'Custom Status', state: "managing bhnso's book baddies 🔧", type: ActivityType.Custom });
   console.log('bbbBOT is online BABYY');
 
