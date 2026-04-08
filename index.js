@@ -50,6 +50,8 @@ const commands = [
   new SlashCommandBuilder().setName('pickpoll').setDescription('.').addStringOption(o => o.setName('options').setDescription('books separated by commas').setRequired(true)).addUserOption(o => o.setName('target').setDescription('who needs help picking?').setRequired(false)),
   new SlashCommandBuilder().setName('setup-roles').setDescription('.').addChannelOption(o => o.setName('channel').setDescription('.').setRequired(true)).addRoleOption(o => o.setName('picks').setDescription('.').setRequired(true)).addRoleOption(o => o.setName('archive').setDescription('.').setRequired(true)).addRoleOption(o => o.setName('rating').setDescription('.').setRequired(true)).addRoleOption(o => o.setName('announcements').setDescription('.').setRequired(true)),
   new SlashCommandBuilder().setName('minion').setDescription('.').addStringOption(o => o.setName('trigger').setDescription('.').setRequired(true)).addStringOption(o => o.setName('reply').setDescription('.').setRequired(true)),
+  new SlashCommandBuilder().setName('backup').setDescription('download database backup'),
+  new SlashCommandBuilder().setName('backup2').setDescription('download books backup'),
 ].map(c => c.toJSON());
 
 const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
@@ -188,6 +190,46 @@ client.on('interactionCreate', async i => {
       return i.editReply({ content: null, embeds: [getRatingEmbed(msgId)], components: rows });
     }
 
+
+// TRYING TO SEE IF COMMAND BACKUP WWILL WORK
+
+  if (i.commandName === 'backup') {
+    try {
+      await i.deferReply();
+
+      await i.editReply({
+        content: 'Here is the database backup:',
+        files: ['./database.json']
+      });
+    } catch (err) {
+      console.error(err);
+      await i.editReply('❌ Failed to send database backup');
+    }
+  }
+
+  if (i.commandName === 'backup2') {
+    try {
+      await i.deferReply();
+
+      await i.editReply({
+        content: 'Here is the books backup:',
+        files: ['./books.json']
+      });
+    } catch (err) {
+      console.error(err);
+      await i.editReply('❌ Failed to send books backup');
+    }
+  }
+
+
+// it worked hehe
+
+
+
+
+
+
+
     if (i.commandName === 'slap') {
       const target = i.options.getUser('target');
       const tName = `<@${target.id}>`;
@@ -197,21 +239,6 @@ client.on('interactionCreate', async i => {
 
 
 
-    if (interaction.commandName === 'backup') {
-  await interaction.reply({
-    content: 'Here is the database backup:',
-    files: ['./database.json']
-  });
-}
-
-
-    
-if (interaction.commandName === 'backup2') {
-  await interaction.reply({
-    content: 'Here is the books backup:',
-    files: ['./books.json']
-  });
-}
 
 
 
