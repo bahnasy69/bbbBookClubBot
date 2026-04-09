@@ -4,13 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-	"start": "node index.js"
+    "start": "node index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "canvas": "^3.2.3",
     "discord.js": "^14.26.2",
     "dotenv": "^17.4.1"
   }
