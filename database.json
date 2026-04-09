@@ -6,6 +6,7 @@
       "author": "Sarah Pinsker",
       "cover": "https://media.discordapp.net/attachments/1489941396097077248/1489967280459878530/BBB1.2.jpg?ex=69d79da9&is=69d64c29&hm=8de0366dc138f605fe1aa9129ae6745ab90ce9737f03d7a501961f0e8927b154&=&format=webp&width=407&height=465",
       "color": "#d0fa03",
+      "rewardRoleId": "1491531726730559552",
       "active": true,
       "votes": {
         "571951256982257665": 4.25
@@ -27,10 +28,18 @@
         "user": "1489600439581151403",
         "text": "how crazy would it be if the government is the one behind all whatever this thing is because they wanna isolate or control ppl or some shit",
         "percent": 17
+      },
+      {
+        "user": "1011559797893627994",
+        "text": "this is just to try if this is working : do we think Luce has a crush on Gemma ?",
+        "percent": 5
       }
     ]
   },
-  "minions": {},
+  "minions": {
+    "where's my minion?": "RIGHT HERE GRAND DADDY MASTER. WHAT DO YOU WISH OF ME? MY VERY SEXY HANDSOME FUNNY AWESOME CREATOR!!",
+    "/cheer": "WOOOOOOOO LETS GOOO 🎉🎉🥳🥳🥳"
+  },
   "pickpolls": {
     "1775688712895": {
       "options": [
