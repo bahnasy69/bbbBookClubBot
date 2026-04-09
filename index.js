@@ -1,16 +1,20 @@
 require('dotenv').config();
 const fs = require('fs');
 const { 
-  Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder,
+  Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder, AttachmentBuilder,
   ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, ActivityType, MessageFlags 
 } = require('discord.js');
+
+const { createCanvas, loadImage } = require('canvas');
+const path = require('path');
 
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds, 
     GatewayIntentBits.GuildMessages, 
     GatewayIntentBits.GuildMessageReactions,
-    GatewayIntentBits.MessageContent 
+    GatewayIntentBits.MessageContent,
+	GatewayIntentBits.GuildMembers
   ]
 });
 
@@ -42,7 +46,7 @@ const commands = [
   new SlashCommandBuilder().setName('timeout').setDescription('.').addUserOption(o => o.setName('target').setDescription('.').setRequired(true)).addIntegerOption(o => o.setName('minutes').setDescription('.').setRequired(true)).addStringOption(o => o.setName('reason').setDescription('.').setRequired(false)),
   new SlashCommandBuilder().setName('setbook').setDescription('.').addStringOption(o => o.setName('id').setDescription('.').setRequired(true)).addStringOption(o => o.setName('title').setDescription('.').setRequired(true)).addStringOption(o => o.setName('author').setDescription('.').setRequired(true)).addStringOption(o => o.setName('synopsis').setDescription('.').setRequired(true)).addStringOption(o => o.setName('cover').setDescription('.').setRequired(false)).addStringOption(o => o.setName('deadline').setDescription('.').setRequired(false)),
   new SlashCommandBuilder().setName('setcr').setDescription('.').addStringOption(o => o.setName('id').setDescription('.').setRequired(true)),
-  new SlashCommandBuilder().setName('ratebook').setDescription('.').addStringOption(o => o.setName('id').setDescription('.').setRequired(true)).addStringOption(o => o.setName('color').setDescription('.').setRequired(false)).addRoleOption(o => o.setName('role').setDescription('.').setRequired(false)),
+  new SlashCommandBuilder().setName('ratebook').setDescription('.').addStringOption(o => o.setName('id').setDescription('.').setRequired(true)).addStringOption(o => o.setName('color').setDescription('.').setRequired(false)).addRoleOption(o => o.setName('ping_role').setDescription('the role to ping for this poll (e.g. rating book ping)')).addRoleOption(o => o.setName('reward_role').setDescription('the role to give to people who rate it (e.g. Read Book #1)')),
   new SlashCommandBuilder().setName('endpoll').setDescription('.').addStringOption(o => o.setName('msg_id').setDescription('.').setRequired(true)),
   new SlashCommandBuilder().setName('stats').setDescription('.').addStringOption(o => o.setName('msg_id').setDescription('.').setRequired(true)),
   new SlashCommandBuilder().setName('removevote').setDescription('.').addStringOption(o => o.setName('msg_id').setDescription('.').setRequired(true)).addUserOption(o => o.setName('user').setDescription('.').setRequired(true)),
@@ -50,6 +54,9 @@ const commands = [
   new SlashCommandBuilder().setName('pickpoll').setDescription('.').addStringOption(o => o.setName('options').setDescription('books separated by commas').setRequired(true)).addUserOption(o => o.setName('target').setDescription('who needs help picking?').setRequired(false)),
   new SlashCommandBuilder().setName('setup-roles').setDescription('.').addChannelOption(o => o.setName('channel').setDescription('.').setRequired(true)).addRoleOption(o => o.setName('picks').setDescription('.').setRequired(true)).addRoleOption(o => o.setName('archive').setDescription('.').setRequired(true)).addRoleOption(o => o.setName('rating').setDescription('.').setRequired(true)).addRoleOption(o => o.setName('announcements').setDescription('.').setRequired(true)),
   new SlashCommandBuilder().setName('minion').setDescription('.').addStringOption(o => o.setName('trigger').setDescription('.').setRequired(true)).addStringOption(o => o.setName('reply').setDescription('.').setRequired(true)),
+  new SlashCommandBuilder().setName('epub').setDescription('..🤫'),
+  new SlashCommandBuilder().setName('audiobook').setDescription('..🤫'),
+  new SlashCommandBuilder().setName('testwelcome').setDescription('.'),
   new SlashCommandBuilder().setName('backup').setDescription('download database backup'),
   new SlashCommandBuilder().setName('backup2').setDescription('download books backup'),
 ].map(c => c.toJSON());
@@ -60,7 +67,7 @@ const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 })();
 
 // FIXED: Changed 'ready' to 'clientReady' to remove deprecation warning
-client.once('ready', async () => {
+client.once('clientReady', async () => {
   client.user.setActivity({ name: 'Custom Status', state: "managing bhnso's book baddies 🔧", type: ActivityType.Custom });
   console.log('bbbBOT is online BABYY');
 
@@ -187,6 +194,7 @@ client.on('messageCreate', async message => {
 
 client.on('interactionCreate', async i => {
   const author = `<@${i.user.id}>`;
+  
   if (i.isChatInputCommand()) {
     // Initialize DB keys to prevent crashes
     const db = loadData('./database.json');
@@ -202,6 +210,9 @@ client.on('interactionCreate', async i => {
     if (i.commandName === 'ratebook') {
       const books = loadData('./books.json');
       const book = books.library[i.options.getString('id')];
+	  const targetRole = i.options.getRole('role');
+	  const pingRole = i.options.getRole('ping_role');
+      const rewardRole = i.options.getRole('reward_role');
       if (!book) return i.reply('invalid book id.');
       const rows = [];
       let row = new ActionRowBuilder();
@@ -221,9 +232,22 @@ client.on('interactionCreate', async i => {
       }
       if (!msgId) return i.editReply({ content: 'failed to create poll.' });
 
-      db.polls[msgId] = { bookId: i.options.getString('id'), title: book.title, author: book.author, cover: book.cover, color: i.options.getString('color'), active: true, votes: {} };
+	  db.polls[msgId] = { 
+		  bookId: i.options.getString('id'), 
+		  title: book.title, 
+          author: book.author, 
+          cover: book.cover, 
+          color: i.options.getString('color'), 
+          rewardRoleId: rewardRole?.id, // We save the reward role here
+          active: true, 
+        votes: {} 
+		};
       saveData('./database.json', db);
-      return i.editReply({ content: null, embeds: [getRatingEmbed(msgId)], components: rows });
+      return i.editReply({ 
+        content: pingRole ? `<@&${pingRole.id}>` : null, 
+        embeds: [getRatingEmbed(msgId)], 
+        components: rows 
+      });
     }
 
 
@@ -263,6 +287,25 @@ client.on('interactionCreate', async i => {
 
 
 
+if (i.commandName === 'testwelcome') {
+      await i.deferReply({ flags: MessageFlags.Ephemeral });
+      try {
+        const attachment = await buildWelcomeImage(i.member);
+        return i.editReply({ content: 'Here is your welcome test:', files: [attachment] });
+      } catch (err) {
+        console.error(err);
+        return i.editReply('failed to generate image.');
+      }
+    }
+
+
+
+if (i.commandName === 'epub' || i.commandName === 'audiobook') {
+      return i.reply({ 
+        content: "https://docs.google.com/document/u/0/d/e/2PACX-1vQwhj-z-z69x_dqyYr5JKxb_CkHP50e12MZv5o56lpz_OGjslvfz_Gf1neWLVDwW5Oyk79d0go71lCs/pub?pli=1", 
+        flags: MessageFlags.Ephemeral 
+      });
+    }
 
 
 
@@ -423,12 +466,32 @@ client.on('interactionCreate', async i => {
       if (!poll || !poll.active) return i.reply({ content: 'locked.', flags: MessageFlags.Ephemeral });
       const choice = i.customId.replace('rate_', '');
       const val = (choice === 'dnf' || choice === 'read') ? choice : parseFloat(choice);
+	  
+	  // Give the reward role if it exists and they didn't click DNF
+      if (poll.rewardRoleId && choice !== 'dnf') {
+        try {
+          const member = await i.guild.members.fetch(i.user.id);
+          if (!member.roles.cache.has(poll.rewardRoleId)) {
+            await member.roles.add(poll.rewardRoleId);
+          }
+        } catch (err) {
+          console.error('Role assignment failed:', err);
+        }
+      }
+	  
       if (Number.isNaN(val)) return i.reply({ content: 'locked.', flags: MessageFlags.Ephemeral });
 
       if (Object.prototype.hasOwnProperty.call(poll.votes, i.user.id) && poll.votes[i.user.id] === val) {
         delete poll.votes[i.user.id];
       } else {
         poll.votes[i.user.id] = val;
+      }
+	  // Check if a role should be assigned (and they didn't click DNF)
+      if (poll.roleId && choice !== 'dnf') {
+        const role = await i.guild.roles.fetch(poll.roleId);
+        if (role) {
+          await i.member.roles.add(role).catch(err => console.error("Couldn't assign role:", err));
+        }
       }
       saveData('./database.json', db);
       await i.message.edit({ embeds: [getRatingEmbed(i.message.id)] });
@@ -452,6 +515,59 @@ client.on('interactionCreate', async i => {
     }
   }
 });
+
+
+
+// Function to generate the image
+async function buildWelcomeImage(member) {
+  const canvas = createCanvas(1085, 540);
+  const ctx = canvas.getContext('2d');
+  
+  // 1. Draw your background (Make sure the file name matches!)
+  const bg = await loadImage('./welcome_bg.png'); 
+  ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
+
+  // 2. Fetch the user's avatar
+  const avatarURL = member.user.displayAvatarURL({ extension: 'png', size: 256 });
+  const avatar = await loadImage(avatarURL);
+
+  // 3. Set the coordinates for the avatar (YOU NEED TO ADJUST THESE!)
+  const avatarX = 300; // Center X coordinate of your circle
+  const avatarY = 315; // Center Y coordinate of your circle
+  const radius = 235 / 2; // 117.5px
+
+  // 4. Draw the circular clip and avatar
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(avatarX, avatarY, radius, 0, Math.PI * 2, true);
+  ctx.closePath();
+  ctx.clip();
+  ctx.drawImage(avatar, avatarX - radius, avatarY - radius, 235, 235);
+  ctx.restore();
+
+  return new AttachmentBuilder(canvas.toBuffer('image/png'), { name: 'welcome.png' });
+}
+
+// Auto-trigger on new member
+client.on('guildMemberAdd', async member => {
+  const welcomeChannelId = 'YOUR_WELCOME_CHANNEL_ID'; // UPDATE THIS
+  const channel = member.guild.channels.cache.get(welcomeChannelId);
+  if (!channel) return;
+
+  try {
+    const attachment = await buildWelcomeImage(member);
+    await channel.send({ 
+      content: `### HELLO NEW BADDIE, <@${member.id}>! 💗\nwe're so glad you joined the baddies. head over to <#1489940970983129199> to get started!`, 
+      files: [attachment] 
+    });
+  } catch (err) {
+    console.error('Welcome image failed:', err);
+  }
+});
+
+
+
+
 
 client.login(process.env.TOKEN);
 
