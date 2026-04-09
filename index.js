@@ -389,7 +389,7 @@ if (i.commandName === 'epub' || i.commandName === 'audiobook') {
     }
 
     if (i.commandName === 'help') {
-      return i.reply(`**HI BADDIE! 🤩 here are bhnso's book baddies' commands:**\n🧐   **/predict** : share secret theories and predictions of current read (use in <#1491799398059999374>\n📖   **/currentread** : check our cr book \n📜   **/archive** : check out our book club history \n**🤫 /epub & /audiobook **: legally obtained extra copies of our current reads️\n🎉   **/slap - /throw - /orgasm - /deslump - /slump - /gay **: fun stuff`);
+      return i.reply(`**HI BADDIE! 🤩 here are bhnso's book baddies' commands:**\n🧐   **/predict** : share secret theories and predictions of current read (use in <#1491799398059999374>\n📖   **/currentread** : check our cr book \n📜   **/archive** : check out our book club history \n**🤫  /epub & /audiobook **: legally obtained extra copies of our current reads️\n🎉   **/slap - /throw - /orgasm - /deslump - /slump - /gay **: fun stuff`);
     }
 
     if (i.commandName === 'archive') {
@@ -550,7 +550,7 @@ async function buildWelcomeImage(member) {
 
 // Auto-trigger on new member
 client.on('guildMemberAdd', async member => {
-  const welcomeChannelId = 'YOUR_WELCOME_CHANNEL_ID'; // UPDATE THIS
+  const welcomeChannelId = '1489978901382828042'; // UPDATE THIS
   const channel = member.guild.channels.cache.get(welcomeChannelId);
   if (!channel) return;
 
