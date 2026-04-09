@@ -389,7 +389,7 @@ if (i.commandName === 'epub' || i.commandName === 'audiobook') {
     }
 
     if (i.commandName === 'help') {
-      return i.reply(`**HI BADDIE! 🤩 here are bhnso's book baddies' commands:**\n📖   **/currentread** : check our cr book \n📜   **/archive** : check out our book club history \n🧐   **/predict** : share secret theories and predictions of current read\n🎉   **/slap - /throw - /orgasm - /deslump - /slump - /gay **: fun stuff`);
+      return i.reply(`**HI BADDIE! 🤩 here are bhnso's book baddies' commands:**\n🧐   **/predict** : share secret theories and predictions of current read (use in <#1491799398059999374>\n📖   **/currentread** : check our cr book \n📜   **/archive** : check out our book club history \n**🤫 /epub & /audiobook **: legally obtained extra copies of our current reads️\n🎉   **/slap - /throw - /orgasm - /deslump - /slump - /gay **: fun stuff`);
     }
 
     if (i.commandName === 'archive') {
